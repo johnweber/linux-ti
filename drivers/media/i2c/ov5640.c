@@ -14,6 +14,7 @@
 #include <linux/i2c.h>
 #include <linux/init.h>
 #include <linux/module.h>
+#include <linux/nvmem-consumer.h>
 #include <linux/of_device.h>
 #include <linux/pm_runtime.h>
 #include <linux/regulator/consumer.h>
@@ -400,6 +401,9 @@ struct ov5640_dev {
 	enum ov5640_frame_rate current_fr;
 	struct v4l2_fract frame_interval;
 	s64 current_link_freq;
+
+	const struct reg_value *init_setting;
+	u32 init_setting_size;
 
 	struct ov5640_ctrls ctrls;
 
@@ -2376,14 +2380,87 @@ restore_auto_gain:
 static int ov5640_set_framefmt(struct ov5640_dev *sensor,
 			       struct v4l2_mbus_framefmt *format);
 
+/*
+otp_header, ver1
+{
+	1byte: product_name_len;
+	dynamic len: product_name_string;
+	1byte: product_ver;
+	4byte: otp_data_len;
+	1byte: checksum;
+}
+*/
+static void ov5640_read_otp(struct ov5640_dev *sensor)
+{
+	struct i2c_client *client = sensor->i2c_client;
+	struct nvmem_device *otp_flash_nvmem;
+	int __sum;
+	int i;
+	u8 header_version;
+	u8 product_name_len;
+	u8 *product_name;
+	u8 product_version;
+	u32 otp_data_len;
+	u8 otp_data_checksum;
+	u8 *otp_data;
+
+	otp_flash_nvmem = devm_nvmem_device_get(&client->dev, "calib-data");
+	if (IS_ERR(otp_flash_nvmem)) {
+		dev_err(&client->dev, "find not otp flash setting\n");
+		return;
+	}
+
+	nvmem_device_read(otp_flash_nvmem, 0, 1, &header_version);
+	if (header_version == 1) {
+		nvmem_device_read(otp_flash_nvmem, 1, 1, &product_name_len);
+		product_name = kzalloc(product_name_len + 1, GFP_KERNEL);
+		nvmem_device_read(otp_flash_nvmem, 2,
+				  product_name_len, product_name);
+		nvmem_device_read(otp_flash_nvmem, 2 + product_name_len,
+				  1, &product_version);
+		nvmem_device_read(otp_flash_nvmem, 2 + product_name_len + 1,
+				  4, (u8 *)&otp_data_len);
+		nvmem_device_read(otp_flash_nvmem, 2 + product_name_len + 1 + 4,
+				  1, (u8 *)&otp_data_checksum);
+		otp_data = devm_kmalloc(&client->dev, otp_data_len, GFP_KERNEL);
+		nvmem_device_read(otp_flash_nvmem, 2 + product_name_len + 1 + 4 + 1,
+				  otp_data_len, otp_data);
+
+		dev_info(&client->dev, "Product name: %s, Version %d\n",
+			 product_name, product_version);
+
+		for(i = __sum = 0 ; i < otp_data_len ; i++) {
+			__sum += otp_data[i];
+		}
+		__sum %= 0x100;
+
+		dev_dbg(&client->dev, "len %x, checksum %x, sum %x\n",
+			otp_data_len, otp_data_checksum, __sum);
+
+		if (__sum == otp_data_checksum) {
+			dev_info(&client->dev, "overwrite setting\n");
+			sensor->init_setting = (struct reg_value *)otp_data;
+			sensor->init_setting_size = otp_data_len / sizeof(struct reg_value);
+		} else {
+			dev_err(&client->dev, "checksum is not match\n");
+		}
+
+		kfree(product_name);
+	} else {
+		dev_err(&client->dev, "otp data is invalid\n");
+	}
+
+	devm_nvmem_device_put(&client->dev, otp_flash_nvmem);
+}
+
 /* restore the last set video mode after chip power-on */
 static int ov5640_restore_mode(struct ov5640_dev *sensor)
 {
 	int ret;
 
 	/* first load the initial register values */
-	ov5640_load_regs(sensor, ov5640_init_setting,
-			 ARRAY_SIZE(ov5640_init_setting));
+	ov5640_load_regs(sensor, sensor->init_setting,
+			 sensor->init_setting_size);
 
 	ret = ov5640_mod_reg(sensor, OV5640_REG_SYS_ROOT_DIVIDER, 0x3f,
 			     (ilog2(OV5640_SCLK2X_ROOT_DIV) << 2) |
@@ -3975,6 +4052,10 @@ static int ov5640_probe(struct i2c_client *client)
 	ret = ov5640_check_chip_id(sensor);
 	if (ret)
 		goto entity_cleanup;
+
+	sensor->init_setting = &ov5640_init_setting[0];
+	sensor->init_setting_size = ARRAY_SIZE(ov5640_init_setting);
+	ov5640_read_otp(sensor);
 
 	ret = ov5640_init_controls(sensor);
 	if (ret)
