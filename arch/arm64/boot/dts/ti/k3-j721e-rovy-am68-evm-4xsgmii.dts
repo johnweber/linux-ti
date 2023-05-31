@@ -89,37 +89,32 @@
 
 &cpsw9g_mdio {
 	bus_freq = <1000000>;
-	//pinctrl-names = "default";
-	//pinctrl-0 = <&main_sgmii_phy_reset_pins_default>;
-	//reset-gpios = <&main_gpio0 75 GPIO_ACTIVE_LOW>;
-	//reset-assert-us = <35000>;
-	//reset-deassert-us = <75000>;
 	#address-cells = <1>;
 	#size-cells = <0>;
 
 	cpsw9g_phy0: ethernet-phy@4 {
 		reg = <4>;
-		//ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
-		//ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-		//ti,min-output-impedance;
+		reset-gpios = <&pca9554_sgmii 0 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <35000>;
+		reset-deassert-us = <75000>;
 	};
 	cpsw9g_phy1: ethernet-phy@5 {
 		reg = <5>;
-		//ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
-		//ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-		//ti,min-output-impedance;
+		reset-gpios = <&pca9554_sgmii 1 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <35000>;
+		reset-deassert-us = <75000>;
 	};
 	cpsw9g_phy2: ethernet-phy@6 {
 		reg = <6>;
-		//ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
-		//ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-		//ti,min-output-impedance;
+		reset-gpios = <&pca9554_sgmii 2 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <35000>;
+		reset-deassert-us = <75000>;
 	};
 	cpsw9g_phy3: ethernet-phy@7 {
 		reg = <7>;
-		//ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
-		//ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-		//ti,min-output-impedance;
+		reset-gpios = <&pca9554_sgmii 3 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <35000>;
+		reset-deassert-us = <75000>;
 	};
 };
 
@@ -146,4 +141,16 @@
 
 &main_r5fss0_core0 {
 	firmware-name = "pdk-ipc/ipc_echo_test_mcu2_0_release_strip.xer5f";
+};
+
+&main_i2c5 { /* I2C_E */
+	clock-frequency = <400000>;
+
+	pca9554_sgmii: pca9554_sgmii@27 {
+		compatible = "nxp,pca9554";
+		reg = <0x27>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "okay";
+	};
 };
