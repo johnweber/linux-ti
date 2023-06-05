@@ -6,6 +6,7 @@
 /dts-v1/;
 
 #include "k3-j721e.dtsi"
+#include <dt-bindings/gpio/gpio.h>
 
 / {
 	memory@80000000 {
@@ -372,6 +373,12 @@
 			J721E_WKUP_IOPAD(0xc0, PIN_OUTPUT, 0) /* (G25) WKUP_GPIO0_4.MCU_MCAN1_TX */
 		>;
 	};
+
+	mcu_eeprom_som_wp_pins_default: mcu-eeprom-som-wp-pins-default {
+		pinctrl-single,pins = <
+			J721E_WKUP_IOPAD(0x108, PIN_OUTPUT, 7) /* (E26) PMIC_POWER_EN0.WKUP_GPIO0_66 */
+		>;
+	};
 };
 
 &ospi0 {
@@ -582,6 +589,22 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c6_pins_default>;
 	clock-frequency = <400000>;
+};
+
+&wkup_i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&wkup_i2c0_pins_default>;
+	clock-frequency = <400000>;
+
+	eeprom_som: eeprom@51 {
+		compatible = "atmel,24c512";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mcu_eeprom_som_wp_pins_default>;
+		wp-gpios = <&wkup_gpio0 66 GPIO_ACTIVE_HIGH>;
+		reg = <0x51>;
+		pagesize = <128>;
+		status = "okay";
+	};
 };
 
 &main_spi1 { /* SPI_A */
