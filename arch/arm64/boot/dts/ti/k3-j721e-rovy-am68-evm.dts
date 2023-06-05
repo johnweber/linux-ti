@@ -6,7 +6,6 @@
 /dts-v1/;
 
 #include "k3-j721e-rovy-am68.dtsi"
-#include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/net/ti-dp83867.h>
 #include <dt-bindings/phy/phy-cadence.h>
@@ -481,6 +480,12 @@
 			J721E_WKUP_IOPAD(0x4c, PIN_OUTPUT, 7) /* (C23) MCU_OSPI1_D3.WKUP_GPIO0_35 */
 		>;
 	};
+
+	mcu_eeprom_baseboard_wp_pins_default: mcu-eeprom-baseboard-wp-pins-default {
+		pinctrl-single,pins = <
+			J721E_WKUP_IOPAD(0x40, PIN_OUTPUT, 7) /* (D22) MCU_OSPI1_D0.WKUP_GPIO0_32 */
+		>;
+	};
 };
 
 &wkup_uart0 {
@@ -646,6 +651,18 @@
 		IOVDD-supply = <&vsys_io_3v3>;
 		DRVDD-supply = <&vsys_io_3v3>;
 		DVDD-supply = <&vsys_io_1v8>;
+	};
+};
+
+&wkup_i2c0 {
+	eeprom_baseboard: eeprom@50 {
+		compatible = "atmel,24c512";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mcu_eeprom_baseboard_wp_pins_default>;
+		wp-gpios = <&wkup_gpio0 32 GPIO_ACTIVE_HIGH>;
+		reg = <0x50>;
+		pagesize = <128>;
+		status = "okay";
 	};
 };
 
