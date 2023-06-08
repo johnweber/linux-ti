@@ -116,6 +116,21 @@
 		regulator-boot-on;
 	};
 
+	mcu_io_3v0_5v0: fixedregulator-mcuio3v05v0 {
+		/* Output of TPS2001 and TPS22950 */
+		compatible = "regulator-fixed";
+		regulator-name = "mcu_io_3v05v0";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mcu_io_3v0_5v0_en_pins_default>;
+		gpio = <&wkup_gpio0 30 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&vsys_5v0>;
+		enable-active-high;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
 	vdd_mmc1: fixedregulator-sd {
 		compatible = "regulator-fixed";
 		regulator-name = "vdd_mmc1";
@@ -452,6 +467,12 @@
 			J721E_WKUP_IOPAD(0x0084, PIN_INPUT, 0) /* MCU_RGMII1_RD0 */
 			J721E_WKUP_IOPAD(0x0070, PIN_OUTPUT, 0) /* MCU_RGMII1_TXC */
 			J721E_WKUP_IOPAD(0x0074, PIN_INPUT, 0) /* MCU_RGMII1_RXC */
+		>;
+	};
+
+	mcu_io_3v0_5v0_en_pins_default: mcu-io-3v0-5v0-en-pins-default {
+		pinctrl-single,pins = <
+			J721E_WKUP_IOPAD(0x38, PIN_OUTPUT, 7) /* (A23) MCU_OSPI1_LBCLKO.WKUP_GPIO0_30 */
 		>;
 	};
 
