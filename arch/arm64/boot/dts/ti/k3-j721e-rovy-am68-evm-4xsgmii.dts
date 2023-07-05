@@ -97,24 +97,28 @@
 		reset-gpios = <&pca9554_sgmii 0 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
+		rtl821x,aldps-disable;
 	};
 	cpsw9g_phy1: ethernet-phy@5 {
 		reg = <5>;
 		reset-gpios = <&pca9554_sgmii 1 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
+		rtl821x,aldps-disable;
 	};
 	cpsw9g_phy2: ethernet-phy@6 {
 		reg = <6>;
 		reset-gpios = <&pca9554_sgmii 2 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
+		rtl821x,aldps-disable;
 	};
 	cpsw9g_phy3: ethernet-phy@7 {
 		reg = <7>;
 		reset-gpios = <&pca9554_sgmii 3 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
+		rtl821x,aldps-disable;
 	};
 };
 
