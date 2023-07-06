@@ -182,7 +182,6 @@
 		simple-audio-card,routing =
 			"Headphone Jack", "HPLOUT",
 			"Headphone Jack", "HPROUT",
-			"MIC2L", "Mic Jack",
 			"MIC2R", "Mic Jack",
 			"Mic Jack", "Mic Bias";
 		simple-audio-card,format = "dsp_b";
