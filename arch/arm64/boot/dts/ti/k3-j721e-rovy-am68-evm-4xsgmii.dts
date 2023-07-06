@@ -98,6 +98,8 @@
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
 		rtl821x,aldps-disable;
+		rtl821x,clkout-disable;
+		realtek,phy-mode-eee-disable;
 	};
 	cpsw9g_phy1: ethernet-phy@5 {
 		reg = <5>;
@@ -105,6 +107,8 @@
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
 		rtl821x,aldps-disable;
+		rtl821x,clkout-disable;
+		realtek,phy-mode-eee-disable;
 	};
 	cpsw9g_phy2: ethernet-phy@6 {
 		reg = <6>;
@@ -112,6 +116,8 @@
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
 		rtl821x,aldps-disable;
+		rtl821x,clkout-disable;
+		realtek,phy-mode-eee-disable;
 	};
 	cpsw9g_phy3: ethernet-phy@7 {
 		reg = <7>;
@@ -119,6 +125,8 @@
 		reset-assert-us = <35000>;
 		reset-deassert-us = <75000>;
 		rtl821x,aldps-disable;
+		rtl821x,clkout-disable;
+		realtek,phy-mode-eee-disable;
 	};
 };
 
