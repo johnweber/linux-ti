@@ -70,7 +70,7 @@
 	};
 
 	panel@0 {
-		compatible = "tn,vizionpanel";
+		compatible = "tn,vizionpanel_10112880";
 		reg = <0>;
 		status = "okay";
 
