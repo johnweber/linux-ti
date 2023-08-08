@@ -21,7 +21,7 @@
 	fragment@102 {
 		target-path = "/";
 		__overlay__ {
-			model = "TechNexion ROVY-AM68 and EVM baseboard with 4xSGMII";
+			model = "TechNexion ROVY-4VM and EVM baseboard with 4xSGMII";
 			aliases {
 				ethernet1 = "/bus@100000/ethernet@c000000/ethernet-ports/port@5";
 				ethernet2 = "/bus@100000/ethernet@c000000/ethernet-ports/port@6";

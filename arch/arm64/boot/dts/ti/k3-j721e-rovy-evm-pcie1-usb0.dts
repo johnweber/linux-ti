@@ -20,7 +20,7 @@
 		target-path = "/";
 
 		__overlay__ {
-			model = "TechNexion ROVY-AM68 and EVM baseboard with PCIE1(Key B) and USB0(USB 3.0 host)";
+			model = "TechNexion ROVY-4VM and EVM baseboard with PCIE1(Key B) and USB0(USB 3.0 host)";
 		};
 	};
 };
