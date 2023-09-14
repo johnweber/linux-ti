@@ -5,7 +5,6 @@
  * Copyright (c) 2019 Luca Ceresoli <luca@lucaceresoli.net>
  * Copyright (c) 2021 Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>
  */
-
 #include <linux/bitops.h>
 #include <linux/clk.h>
 #include <linux/clk-provider.h>
@@ -1107,12 +1106,6 @@ static int ub960_rxport_probe_one(struct ub960_data *priv,
 
 	dev_dbg(dev, "ser%d: at alias 0x%02x\n", nport, rxport->ser_alias);
 
-	ret = i2c_atr_add_adapter(priv->atr, nport);
-	if (ret) {
-		dev_err(dev, "rx%d: cannot add adapter", nport);
-		goto err_node_put;
-	}
-
 	return 0;
 
 err_node_put:
@@ -2024,6 +2017,28 @@ static int ub960_parse_dt(struct ub960_data *priv)
 		dev_err(dev, "OF: no device tree node!\n");
 		return -ENOENT;
 	}
+	for (n = 0; n < priv->hw_data->num_rxports + priv->hw_data->num_txports; ++n) {
+		struct device_node *ep_np;
+
+		ep_np = of_graph_get_endpoint_by_regs(np, n, 0);
+		if (!ep_np)
+			continue;
+
+		if (n < priv->hw_data->num_rxports)
+			ret = ub960_rxport_probe_one(priv, ep_np, n);
+		else
+			ret = ub960_csiport_probe_one(
+				priv, ep_np, n - priv->hw_data->num_rxports);
+
+		of_node_put(ep_np);
+
+		if (ret)
+			break;
+	}
+	ret = ub960_rxport_probe_serializers(priv);
+	msleep(500);
+	if (ret)
+		ub960_remove_ports(priv);
 
 	n = of_property_read_variable_u16_array(np, "i2c-alias-pool",
 						priv->atr_alias_id,
@@ -2055,27 +2070,18 @@ static int ub960_parse_dt(struct ub960_data *priv)
 
 	dev_dbg(dev, "Nominal data rate: %u", priv->tx_data_rate);
 
-	for (n = 0; n < priv->hw_data->num_rxports + priv->hw_data->num_txports; ++n) {
-		struct device_node *ep_np;
-
-		ep_np = of_graph_get_endpoint_by_regs(np, n, 0);
-		if (!ep_np)
-			continue;
-
-		if (n < priv->hw_data->num_rxports)
-			ret = ub960_rxport_probe_one(priv, ep_np, n);
-		else
-			ret = ub960_csiport_probe_one(
-				priv, ep_np, n - priv->hw_data->num_rxports);
-
-		of_node_put(ep_np);
-
-		if (ret)
-			break;
-	}
-
 	if (ret)
-		ub960_remove_ports(priv);
+		ub960_atr_remove(priv);
+
+	for (n = 0; n < priv->hw_data->num_rxports; ++n) {
+
+		ret = i2c_atr_add_adapter(priv->atr, n);
+
+		if (ret) {
+			dev_err(dev, "rx%d: cannot add adapter", n);
+			return -EINVAL;
+		}
+	}
 
 	return ret;
 }
@@ -2372,9 +2378,7 @@ static int ub960_probe(struct i2c_client *client)
 	if (ret)
 		goto err_parse_dt;
 
-	ret = ub960_rxport_probe_serializers(priv);
-	if (ret)
-		goto err_parse_dt;
+
 
 	/*
 	 * Clear any errors caused by switching the RX port settings while

@@ -7,7 +7,6 @@
  * Copyright (c) 2019 Luca Ceresoli <luca@lucaceresoli.net>
  * Copyright (c) 2021 Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>
  */
-
 #include <linux/clk.h>
 #include <linux/clk-provider.h>
 #include <linux/delay.h>
@@ -939,11 +938,7 @@ static int ub953_general_cfg(struct ub953_data *priv)
 
 	clock_continuous = !of_property_read_bool(priv->rx_ep_np, "clock-noncontinuous");
 
-	return ub953_write(priv, UB953_REG_GENERAL_CFG,
-			   ((clock_continuous) << 6) |
-			   ((num_data_lanes - 1) << 4) |
-			   (1 << 1) | /* CRC TX gen */
-			   (priv->use_1v8_i2c << 0));
+	return 0;
 }
 
 static int ub953_parse_dt(struct ub953_data *priv)
@@ -1009,6 +1004,8 @@ static int ub953_probe(struct i2c_client *client)
 		return ret;
 
 	ub953_soft_reset(priv);
+
+	msleep(500);
 
 	ret = ub953_read(priv, UB953_REG_REV_MASK_ID, &rev);
 	if (ret) {
@@ -1087,6 +1084,10 @@ static int ub953_probe(struct i2c_client *client)
 	if (ret) {
 		goto err_unreg_notif;
 	}
+	ub953_write(priv, UB953_REG_GENERAL_CFG,
+		    (0 << 6) | /* non continuous clk */
+		    (1 << 4) | /* 4 lanes */
+		    (1 << 1)); /* CRC TX gen */
 
 	ub953_general_cfg(priv);
 	if (ret)
