@@ -34,6 +34,9 @@
 		      <J721E_SERDES4_LANE2_QSGMII_LANE7>, <J721E_SERDES4_LANE3_QSGMII_LANE8>;
 };
 
+&usbss0 {
+	ti,vbus-divider;
+};
 
 &usb0 {
 	dr_mode = "otg";
