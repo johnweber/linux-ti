@@ -437,6 +437,12 @@
 			J721E_IOPAD(0xb8, PIN_OUTPUT, 7) /* (AE27) PRG0_PRU0_GPO2.GPIO0_45 */
 		>;
 	};
+
+	main_usbss0_pins_default: main-usbss0-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x290, PIN_OUTPUT, 0) /* (U6) USB0_DRVVBUS */
+		>;
+	};
 };
 
 &wkup_pmx0 {
@@ -564,22 +570,17 @@
 };
 
 &usb_serdes_mux {
-	idle-states = <1>, <0>; /* USB0 to SERDES3, USB1 to SERDES1 */
+	idle-states = <1>, <1>; /* USB0 to SERDES3, USB1 to SERDES2 */
 };
 
 &serdes_ln_ctrl {
 	idle-states = <J721E_SERDES0_LANE0_PCIE0_LANE0>, <J721E_SERDES0_LANE1_PCIE0_LANE1>,
-		      <J721E_SERDES1_LANE0_PCIE1_LANE0>, <J721E_SERDES1_LANE1_USB3_1>,
-		      <J721E_SERDES2_LANE0_PCIE2_LANE0>, <J721E_SERDES2_LANE1_PCIE2_LANE1>,
-		      <J721E_SERDES3_LANE0_PCIE3_LANE0>, <J721E_SERDES3_LANE1_USB3_0>,
+		      <J721E_SERDES1_LANE0_PCIE1_LANE0>, <J721E_SERDES1_LANE1_PCIE1_LANE1>,
+		      <J721E_SERDES2_LANE0_IP1_UNUSED>, <J721E_SERDES2_LANE1_USB3_1>,
+		      <J721E_SERDES3_LANE0_PCIE3_LANE0>, <J721E_SERDES3_LANE1_IP4_UNUSED>,
 		      <J721E_SERDES4_LANE0_QSGMII_LANE5>, <J721E_SERDES4_LANE1_QSGMII_LANE6>,
 		      <J721E_SERDES4_LANE2_QSGMII_LANE7>, <J721E_SERDES4_LANE3_QSGMII_LANE8>;
 };
-
-// &serdes_wiz3 {
-// 	typec-dir-gpios = <&main_gpio1 3 GPIO_ACTIVE_HIGH>;
-// 	typec-dir-debounce-ms = <700>;	/* TUSB321, tCCB_DEFAULT 133 ms */
-// };
 
 &serdes3 {
 	serdes3_pcie_link: phy@0 {
@@ -588,7 +589,7 @@
 		#phy-cells = <0>;
 		cdns,phy-type = <PHY_TYPE_PCIE>;
 		resets = <&serdes_wiz3 1>;
-		status = "disabled";
+		status = "okay";
 	};
 
 	serdes3_usb_link: phy@1 {
@@ -597,7 +598,20 @@
 		#phy-cells = <0>;
 		cdns,phy-type = <PHY_TYPE_USB3>;
 		resets = <&serdes_wiz3 2>;
+		status = "disabled";
 	};
+};
+
+&usbss0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_usbss0_pins_default>;
+	ti,vbus-divider;
+	ti,usb2-only;
+};
+
+&usb0 {
+	dr_mode = "otg";
+	maximum-speed = "high-speed";
 };
 
 &tscadc0 {
@@ -803,34 +817,28 @@
 &serdes1 {
 	serdes1_pcie_link: phy@0 {
 		reg = <0>;
-		cdns,num-lanes = <1>;
+		cdns,num-lanes = <2>;
 		#phy-cells = <0>;
 		cdns,phy-type = <PHY_TYPE_PCIE>;
-		resets = <&serdes_wiz1 1>;
-		status="disabled";
-	};
-
-	serdes1_usb_link: phy@1 {
-		reg = <1>;
-		cdns,num-lanes = <1>;
-		#phy-cells = <0>;
-		cdns,phy-type = <PHY_TYPE_USB3>;
-		resets = <&serdes_wiz1 2>;
+		resets = <&serdes_wiz1 1>, <&serdes_wiz1 2>;
 	};
 };
 
 &serdes2 {
-	assigned-clocks = <&serdes2 CDNS_SIERRA_PLL_CMNLC>;
-	assigned-clock-parents = <&wiz2_pll1_refclk>;
-
-	serdes2_pcie_link: phy@0 {
-		reg = <0>;
-		cdns,num-lanes = <2>;
+	serdes2_usb_link: phy@1 {
+		reg = <1>;
+		cdns,num-lanes = <1>;
 		#phy-cells = <0>;
-		cdns,phy-type = <PHY_TYPE_PCIE>;
-		resets = <&serdes_wiz2 1>, <&serdes_wiz2 2>;
-		status="disabled";
+		cdns,phy-type = <PHY_TYPE_USB3>;
+		resets = <&serdes_wiz2 2>;
 	};
+};
+
+&usb1 {
+	dr_mode = "host";
+	maximum-speed = "super-speed";
+	phys = <&serdes2_usb_link>;
+	phy-names = "cdns3,usb3-phy";
 };
 
 &pcie0_rc {
@@ -850,38 +858,44 @@
 };
 
 &pcie1_rc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_pcie_keyb_rst_pins_default>;
+	reset-gpios = <&main_gpio0 43 GPIO_ACTIVE_HIGH>;
+	#phy-cells = <0>;
 	phys = <&serdes1_pcie_link>;
 	phy-names = "pcie-phy";
-	num-lanes = <1>;
-	status="disabled";
+	num-lanes = <2>;
+	status="okay";
 };
 
 &pcie1_ep {
 	phys = <&serdes1_pcie_link>;
 	phy-names = "pcie-phy";
-	num-lanes = <1>;
+	num-lanes = <2>;
 	status = "disabled";
 };
 
 &pcie2_rc {
-	phys = <&serdes2_pcie_link>;
 	phy-names = "pcie-phy";
 	num-lanes = <2>;
 	status="disabled";
 };
 
 &pcie2_ep {
-	phys = <&serdes2_pcie_link>;
 	phy-names = "pcie-phy";
 	num-lanes = <2>;
 	status = "disabled";
 };
 
 &pcie3_rc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_pcie_keye_rst_pins_default>;
+	reset-gpios = <&main_gpio0 45 GPIO_ACTIVE_HIGH>;
+	#phy-cells = <0>;
 	phys = <&serdes3_pcie_link>;
 	phy-names = "pcie-phy";
 	num-lanes = <1>;
-	status = "disabled";
+	status="okay";
 };
 
 &pcie3_ep {
