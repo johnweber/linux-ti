@@ -700,6 +700,14 @@
 	};
 };
 
+&mcu_spi0 { /* MCU_SPI0 */
+	spidev0: spi@0 {
+		reg = <0>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <500000>;
+	};
+};
+
 &main_spi1 { /* SPI_A */
 	spidev1: spi@0 {
 		reg = <0>;

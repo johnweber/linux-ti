@@ -404,6 +404,15 @@
 			J721E_WKUP_IOPAD(0x30, PIN_OUTPUT, 7) /* (E19) MCU_OSPI0_CSn1.WKUP_GPIO0_28 */
 		>;
 	};
+
+	mcu_spi0_pins_default: mcu_spi0_pins_default {
+		pinctrl-single,pins = <
+			J721E_WKUP_IOPAD(0x90, PIN_INPUT, 0) /* (E27) MCU_SPI0_CLK */
+			J721E_WKUP_IOPAD(0x9c, PIN_INPUT, 0) /* (E25) MCU_SPI0_CS0 */
+			J721E_WKUP_IOPAD(0x94, PIN_INPUT, 0) /* (E24) MCU_SPI0_D0 */
+			J721E_WKUP_IOPAD(0x98, PIN_INPUT, 0) /* (E28) MCU_SPI0_D1 */
+		>;
+	};
 };
 
 &ospi0 {
