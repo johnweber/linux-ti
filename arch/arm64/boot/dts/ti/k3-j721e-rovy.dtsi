@@ -627,12 +627,12 @@
 	pinctrl-0 = <&wkup_i2c0_pins_default>;
 	clock-frequency = <400000>;
 
-	eeprom_som: eeprom@51 {
+	eeprom_som: eeprom@50 {
 		compatible = "atmel,24c512";
 		pinctrl-names = "default";
 		pinctrl-0 = <&mcu_eeprom_som_wp_pins_default>;
 		//wp-gpios = <&wkup_gpio0 66 GPIO_ACTIVE_HIGH>;
-		reg = <0x51>;
+		reg = <0x50>;
 		pagesize = <128>;
 		status = "okay";
 	};
