@@ -153,6 +153,18 @@
 			no-map;
 		};
 	};
+
+	reg_cpld_jtag_switch: cpld_jtag_switch {
+		compatible = "regulator-fixed";
+		regulator-name = "cpld_jtag_switch";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mcu_cpld_jtag_switch_control_pins_default>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&wkup_gpio0 28 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
 };
 
 &main_pmx0 {
@@ -384,6 +396,12 @@
 	mcu_eeprom_som_wp_pins_default: mcu-eeprom-som-wp-pins-default {
 		pinctrl-single,pins = <
 			J721E_WKUP_IOPAD(0x108, PIN_OUTPUT, 7) /* (E26) PMIC_POWER_EN0.WKUP_GPIO0_66 */
+		>;
+	};
+
+	mcu_cpld_jtag_switch_control_pins_default: mcu-cpld-jtag-switch-control-pins-default {
+		pinctrl-single,pins = <
+			J721E_WKUP_IOPAD(0x30, PIN_OUTPUT, 7) /* (E19) MCU_OSPI0_CSn1.WKUP_GPIO0_28 */
 		>;
 	};
 };
