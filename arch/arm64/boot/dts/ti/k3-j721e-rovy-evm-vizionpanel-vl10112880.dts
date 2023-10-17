@@ -1,3 +1,6 @@
+
+
+
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright 2022 Technexion Ltd.
@@ -29,10 +32,21 @@
 	#size-cells = <0>;
 	status = "okay";
 
+	exc80w46: touchscreen@2a {
+		compatible = "eeti,exc80h60";
+		pinctrl-names = "default";
+		pinctrl-0 = <&main_mipi_touch_irq_pins_default>;
+		reg = <0x2a>;
+		interrupt-parent = <&main_gpio1>;
+		interrupts = <24 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+	};
+
 	fpdlink_dsi2lvds: ds90ub948@0c {
 		compatible = "ti,ds90ub94x";
 		reg = <0x0c>;
 		status = "okay";
+		//reset-gpios = <&pca9554_23 4 GPIO_ACTIVE_LOW>;
 	};
 };
 
