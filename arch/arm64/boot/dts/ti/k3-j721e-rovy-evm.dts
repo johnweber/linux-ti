@@ -443,6 +443,12 @@
 			J721E_IOPAD(0x290, PIN_OUTPUT, 0) /* (U6) USB0_DRVVBUS */
 		>;
 	};
+
+	main_mipi_touch_irq_pins_default: main-mipi-touch-irq-pins-default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x264, PIN_INPUT, 7) /* (T29) MMC2_DAT2.GPIO1_24 */
+		>;
+	};
 };
 
 &wkup_pmx0 {
