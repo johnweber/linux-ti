@@ -680,6 +680,15 @@
 		#gpio-cells = <2>;
 		status = "okay";
 	};
+
+	rtc_ds1337: ds1337@68 {
+		compatible = "dallas,ds1337";
+		reg = <0x68>;
+		wakeup-source;
+		interrupt-parent = <&tca9555_22>;
+		interrupts = <8 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+	};
 };
 
 &main_i2c4 { /* I2C_D */
