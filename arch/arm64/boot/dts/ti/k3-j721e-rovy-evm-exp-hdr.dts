@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: GPL-2.0
+/**
+ * DT Overlay for enabling GPIO on the expansion headers of ROVY-4VM EVM
+ *
+ * Copyright (C) 2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (C) 2023 TechNexion Ltd. - https://www.technexion.com
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pinctrl/k3.h>
+
+&main_pmx0 {
+	exp_hdr_gpio0_pins_default: exp_hdr_gpio0_pins_default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x14, PIN_INPUT_PULLDOWN, 7) /* (AH23) PRG1_PRU0_GPO4.GPIO0_5 */   /* MAIN_GPIO0 */
+			J721E_IOPAD(0x1c, PIN_INPUT_PULLDOWN, 7) /* (AD22) PRG1_PRU0_GPO6.GPIO0_7 */   /* MAIN_GPIO1 */
+			J721E_IOPAD(0x28, PIN_INPUT_PULLDOWN, 7) /* (AG20) PRG1_PRU0_GPO9.GPIO0_10 */  /* MAIN_GPIO2 */
+			J721E_IOPAD(0x30, PIN_INPUT_PULLDOWN, 7) /* (AF24) PRG1_PRU0_GPO11.GPIO0_12 */ /* MAIN_GPIO3 */ 
+			J721E_IOPAD(0x34, PIN_INPUT_PULLDOWN, 7) /* (AJ24) PRG1_PRU0_GPO12.GPIO0_13 */ /* MAIN_GPIO4 */
+			J721E_IOPAD(0x38, PIN_INPUT_PULLDOWN, 7) /* (AG24) PRG1_PRU0_GPO13.GPIO0_14 */ /* MAIN_GPIO5 */ 
+			J721E_IOPAD(0x40, PIN_INPUT_PULLDOWN, 7) /* (AC24) PRG1_PRU0_GPO15.GPIO0_16 */ /* CAN_E_TX */ 
+			J721E_IOPAD(0x44, PIN_INPUT_PULLDOWN, 7) /* (AE24) PRG1_PRU0_GPO16.GPIO0_17 */ /* CAN_E_RX */
+			J721E_IOPAD(0x158, PIN_INPUT_PULLDOWN, 7) /* (U23) RGMII5_TX_CTL.GPIO0_85 */   /* AUD_B_TXC */
+			J721E_IOPAD(0x15c, PIN_INPUT_PULLDOWN, 7) /* (U26) RGMII5_RX_CTL.GPIO0_86 */   /* AUD_B_TXFS */
+			J721E_IOPAD(0x160, PIN_INPUT_PULLDOWN, 7) /* (V28) RGMII5_TD3.GPIO0_87 */      /* AUD_B_TXD */
+			J721E_IOPAD(0x164, PIN_INPUT_PULLDOWN, 7) /* (V29) RGMII5_TD2.GPIO0_88 */      /* AUD_B_RXD */
+			J721E_IOPAD(0x168, PIN_INPUT_PULLDOWN, 7) /* (V27) RGMII5_TD1.GPIO0_89 */      /* MAIN_GPIO7 */
+			J721E_IOPAD(0x16c, PIN_INPUT_PULLDOWN, 7) /* (U28) RGMII5_TD0.GPIO0_90 */      /* PWM_A */
+		    J721E_IOPAD(0x1d4, PIN_INPUT_PULLDOWN, 7) /* (Y3) SPI1_CS0.GPIO0_116 */        /* SPI_A_CS0 */ 
+		    J721E_IOPAD(0x1d8, PIN_INPUT_PULLDOWN, 7) /* (W4) SPI1_CS1.GPIO0_117 */        /* SPI_A_CS1 */   
+		    J721E_IOPAD(0x1dc, PIN_INPUT_PULLDOWN, 7) /* (Y1) SPI1_CLK.GPIO0_118 */        /* SPI_A_CLK */   
+		    J721E_IOPAD(0x1e0, PIN_INPUT_PULLDOWN, 7) /* (Y5) SPI1_D0.GPIO0_119 */         /* SPI_A_D0 */   
+		    J721E_IOPAD(0x1e4, PIN_INPUT_PULLDOWN, 7) /* (Y2) SPI1_D1.GPIO0_120 */         /* SPI_A_D1 */  
+		>;
+	};
+
+	exp_hdr_gpio1_pins_default: exp_hdr_gpio1_pins_default {
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x238, PIN_INPUT_PULLDOWN, 7) /* (V6) TIMER_IO0.GPIO1_13 */        /* MAIN_GPIO18 */
+		>;
+	};
+};
+
+
+&main_gpio0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&exp_hdr_gpio0_pins_default>;
+};
+
+&main_gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&exp_hdr_gpio1_pins_default>;
+};

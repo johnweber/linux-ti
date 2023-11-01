@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: GPL-2.0
+/**
+ * DT Overlay for enabling SPI_B using the default pins on ROVY-4VM
+ *
+ * Copyright (C) 2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (C) 2023 TechNexion Ltd. - https://www.technexion.com
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pinctrl/k3.h>
+
+&main_pmx0 {
+
+	main_spi5_pins_default: main-spi5-pins-default { /* SPI_B */
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x1a0, PIN_OUTPUT, 3) /* (W29) RGMII6_TXC.SPI5_CLK */
+			J721E_IOPAD(0x19c, PIN_INPUT, 3) /* (W27) RGMII6_TD0.SPI5_CS0 */
+			J721E_IOPAD(0x1b4, PIN_OUTPUT, 3) /* (W25) RGMII6_RD0.SPI5_CS1 */
+			J721E_IOPAD(0x198, PIN_OUTPUT, 3) /* (V25) RGMII6_TD1.SPI5_D0 */
+			J721E_IOPAD(0x1b0, PIN_INPUT, 3) /* (W24) RGMII6_RD1.SPI5_D1 */
+		>;
+	};
+
+};
+
+&main_spi5 { /* SPI_B */
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_spi5_pins_default>;
+	ti,pindir-d0-out-d1-in = <1>;    /* MOSI on D0, MISO on D1 */
+	ti,spi-num-cs = <2>;
+	cs-gpios = <0>, <0>;    /* 2 Native CS0,1 */
+	status = "ok";
+};

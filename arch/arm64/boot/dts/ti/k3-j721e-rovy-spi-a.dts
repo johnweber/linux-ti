@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: GPL-2.0
+/**
+ * DT Overlay for enabling SPI_A using the default SPI pins on ROVY-4VM
+ *
+ * Copyright (C) 2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (C) 2023 TechNexion Ltd. - https://www.technexion.com
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pinctrl/k3.h>
+
+&main_pmx0 {
+
+	main_spi1_pins_default: main-spi1-pins-default { /* SPI_A */
+		pinctrl-single,pins = <
+			J721E_IOPAD(0x1dc, PIN_OUTPUT, 0) /* (Y1) SPI1_CLK */
+			J721E_IOPAD(0x1d4, PIN_OUTPUT, 0) /* (Y3) SPI1_CS0 */
+			J721E_IOPAD(0x1d8, PIN_OUTPUT, 0) /* (W4) SPI1_CS1 */
+			J721E_IOPAD(0x1e0, PIN_OUTPUT, 0) /* (Y5) SPI1_D0 */
+			J721E_IOPAD(0x1e4, PIN_INPUT, 0) /* (Y2) SPI1_D1 */
+		>;
+	};
+
+};
+
+&main_spi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_spi1_pins_default>;
+	ti,pindir-d0-out-d1-in = <1>;    /* MOSI on D0, MISO on D1 */
+	ti,spi-num-cs = <2>;
+	cs-gpios = <0>, <0>;    /* 2 Native CS0,1 */
+	status = "ok";
+};
